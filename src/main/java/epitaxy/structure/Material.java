@@ -42,6 +42,7 @@ public class Material {
         this.data = data;
         this.timeStamp = timeStamp;
         this.centerLayerTimeStamp = centerLayerTimeStamp;
+        parameters = data.getGrowthParameters();
         initMaterial();
     }
 
