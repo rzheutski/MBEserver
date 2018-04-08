@@ -14,12 +14,12 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) throws IOException {
 
-        Data data = FilesMBE.getData("e:/B052/values.csv", "e:/B052/shutters.csv", "e:/B052/settings2.json");
+        Data data = FilesMBE.getData("resources/input/B052/values.csv", "resources/input/B052/shutters.csv", "resources/input/B052/settings2.json");
         Heterostructure B052 = new Heterostructure(data);
 
         List<GrowthParameter> growthParameters = data.getGrowthParameters();
 
-        FilesMBE.saveValues("e:/B052/pyro.txt", growthParameters.get(9));
+        FilesMBE.saveValues("resources/output/pyro.txt", growthParameters.get(9));
         System.out.println("slope = " + Approximation.getLinearFit(growthParameters.get(9), 1503230089052l, 1503256991992l).getFitValue(1503256991992l));
         System.out.println("constant = " + Approximation.getConstant(growthParameters.get(9), 1503230089052l, 1503256991992l));
 

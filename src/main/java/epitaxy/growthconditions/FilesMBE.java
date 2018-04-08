@@ -22,11 +22,12 @@ public class FilesMBE {
 
     /**
      * It creates a file and saves timestamps and values separated tabulation character from a GrowthParameter to the file.
-     * @param filePath file path
+     * @param filePath path to the file
      * @param growthParameter a GrowthParameter object
      */
     public static void saveValues(String filePath, GrowthParameter growthParameter) {
         try {
+            Files.createDirectories(Paths.get(filePath).getParent());
             BufferedWriter writer =  Files.newBufferedWriter(Paths.get(filePath), Charset.defaultCharset());
             for (int i = 0; i < growthParameter.size(); i++) {
                 StringBuilder s = new StringBuilder();
