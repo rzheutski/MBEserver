@@ -24,7 +24,7 @@ public class Approximation {
             return slope;
         }
 
-        public double getFitValue(long timeStamp) {
+        public double getValue(long timeStamp) {
             return slope*timeStamp + intercept;
         }
     }

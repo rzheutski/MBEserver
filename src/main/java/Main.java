@@ -20,7 +20,7 @@ public class Main {
         List<GrowthParameter> growthParameters = data.getGrowthParameters();
 
         FilesMBE.saveValues("resources/output/pyro.txt", growthParameters.get(9));
-        System.out.println("slope = " + Approximation.getLinearFit(growthParameters.get(9), 1503230089052l, 1503256991992l).getFitValue(1503256991992l));
+        System.out.println("slope = " + Approximation.getLinearFit(growthParameters.get(9), 1503230089052l, 1503256991992l).getValue(1503256991992l));
         System.out.println("constant = " + Approximation.getConstant(growthParameters.get(9), 1503230089052l, 1503256991992l));
 
 

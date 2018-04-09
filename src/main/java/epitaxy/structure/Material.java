@@ -1,6 +1,7 @@
 package epitaxy.structure;
 
 import epitaxy.growthconditions.Data;
+import epitaxy.growthconditions.datatreatment.Approximation;
 import epitaxy.growthconditions.parameters.GrowthParameter;
 
 import java.util.List;
@@ -28,6 +29,14 @@ public class Material {
     private List<GrowthParameter> parameters;
     private long centerLayerTimeStamp;
 
+    private double pyrometerTemperature;
+
+    //stoichiometry coefficients
+    private double xInN; // Indium nitride mole fraction
+    private double yAlN; // Aluminium nitride mole fraction
+
+    private List<GrowthParameter> dopants;
+
     public Material(Data data, long timeStamp) {
         this(data, timeStamp, 0);
     }
@@ -51,7 +60,7 @@ public class Material {
      */
     private void initMaterial() {
         setActiveParameters();
-        determineMaterial();
+        getStoichiometry();
     }
 
     /**
@@ -74,10 +83,12 @@ public class Material {
     }
 
     /**
-     * It determines a chemical formula for the material and seta all its parameters.
+     * It determines a chemical formula for the material and sets all its parameters.
      */
-    private void determineMaterial() {
+    private void getStoichiometry() {
+        determinePyrometerTemperature();
         if ( (isPresent(gallium) | isPresent(aluminium) | isPresent(indium)) & isPresent(ammonia) ) ammoniaInAlGaN();
+
     }
 
     /**
@@ -87,8 +98,31 @@ public class Material {
 
     }
 
+    /**
+     * It checks if a growth parameter is actual for the given layer
+     * @param parameter growth parameter to be checked
+     * @return true if the growth parameter is actual or false otherwise
+     */
     private boolean isPresent(GrowthParameter parameter) {
-        return (parameter != null);
+        return (parameter.getValueAtTimeStamp(centerLayerTimeStamp) != null);
+    }
+
+    /**
+     * It determines pyrometer temperature at the timeStamp accepted via constructor. A pyrometer temperature is a rather specific parameter which is calculated taking into account a substrate heat power.
+     * @return pyrometer temparature value
+     */
+    private void determinePyrometerTemperature() {
+        long startLayerTimeStamp = 0;
+        long stopLayerTimeStamp = 0;
+        for (int i = 1; i < substrateHeatPower.size(); i++) {
+            if (substrateHeatPower.getTimeStamp(i) > centerLayerTimeStamp) {
+                startLayerTimeStamp = substrateHeatPower.getTimeStamp(i-1);
+                stopLayerTimeStamp = substrateHeatPower.getTimeStamp(i);
+            }
+        }
+        if (substrateHeatPower.getValueAtTimeStamp(startLayerTimeStamp) == substrateHeatPower.getValueAtTimeStamp(stopLayerTimeStamp)) pyrometerTemperature = Approximation.getConstant(pyrometer, startLayerTimeStamp, stopLayerTimeStamp);
+        else pyrometerTemperature = Approximation.getLinearFit(pyrometer, startLayerTimeStamp, stopLayerTimeStamp).getValue(timeStamp);
+
     }
 
 
