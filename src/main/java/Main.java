@@ -26,8 +26,8 @@ public class Main {
 
 
 /*        for (GrowthParameter growthParameter : growthParameters)
-        if (growthParameter instanceof GrowthParameterWithShutter) {
-            System.out.println(((GrowthParameterWithShutter) growthParameter).ShuttterEventsToString());
+        if (growthParameter instanceof Precursor) {
+            System.out.println(((Precursor) growthParameter).ShuttterEventsToString());
 
             Map<Long,Long> intervals = growthParameter.getIntervals();
             StringBuilder s = new StringBuilder();

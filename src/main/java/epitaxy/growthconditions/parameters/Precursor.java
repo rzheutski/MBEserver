@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This abstract class extends the abstract GrowthParameter class and contains additional fields and methods for shutters.
+ * This abstract class extends the abstract GrowthParameter class and contains additional fields and methods for a precursor i.e. for compound that participates in a chemical reaction.
  */
-public abstract class GrowthParameterWithShutter extends GrowthParameter {
+public abstract class Precursor extends GrowthParameter {
     protected List<Long> shutterTime;
     protected List<Boolean> shutterState; // "true" - shutter switch on; "false" - shutter switch off
 
-    public GrowthParameterWithShutter() {
+    public Precursor() {
         super();
         shutterTime = new ArrayList<>();
         shutterState = new ArrayList<>();
@@ -64,5 +64,13 @@ public abstract class GrowthParameterWithShutter extends GrowthParameter {
 
         return s.toString();
     }
+
+    /**
+     * Returns value of growth rate for the precursor at the given time stamp and substrate temperature
+     * @param timeStamp time stamp for the growth rate got
+     * @param substrateTemperature value of substrate temperature
+     * @return growth rate value in um/hour units
+     */
+    abstract protected double getGrowthRate(long timeStamp, double substrateTemperature);
 
 }

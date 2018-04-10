@@ -2,7 +2,7 @@ package epitaxy.growthconditions;
 
 import com.google.gson.Gson;
 import epitaxy.growthconditions.parameters.GrowthParameter;
-import epitaxy.growthconditions.parameters.GrowthParameterWithShutter;
+import epitaxy.growthconditions.parameters.Precursor;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -173,7 +173,7 @@ public class FilesMBE {
         for (int i = 0; i < parametersNumber; i++) parameterIndexes.add(null);
         for (int j = 0; j < growthParameters.size(); j++) {
             for (int i = 0; i < parametersNumber; i++) {
-                if ((captions.get(i).contains(growthParameters.get(j).getName())) && (growthParameters.get(j) instanceof GrowthParameterWithShutter) ) {
+                if ((captions.get(i).contains(growthParameters.get(j).getName())) && (growthParameters.get(j) instanceof Precursor) ) {
                     parameterIndexes.set(i, j);
                     break;
                 }
@@ -194,9 +194,9 @@ public class FilesMBE {
             if (timeStamp > stopTimeStamp) break;
             if (timeStamp >= startTimeStamp) {
                 for (int i = 0; i < parametersNumber; i++) {
-                    if ( (!currentLine.get(i).equals(previousLine.get(i))) && (parameterIndexes.get(i) != null) && (growthParameters.get(parameterIndexes.get(i)) instanceof GrowthParameterWithShutter) )
+                    if ( (!currentLine.get(i).equals(previousLine.get(i))) && (parameterIndexes.get(i) != null) && (growthParameters.get(parameterIndexes.get(i)) instanceof Precursor) )
                     {
-                        GrowthParameterWithShutter grParameter = (GrowthParameterWithShutter) growthParameters.get(parameterIndexes.get(i));
+                        Precursor grParameter = (Precursor) growthParameters.get(parameterIndexes.get(i));
                         grParameter.setShutterEvent(timeStamp, currentLine.get(i));
                         previousLine.set(i, currentLine.get(i));
                     }
@@ -221,6 +221,6 @@ public class FilesMBE {
      */
     private static void processGrowthParameters(List<GrowthParameter> growthParameters) {
         for (GrowthParameter growthParameter : growthParameters)
-            growthParameter.process();
+            growthParameter.init();
     }
 }

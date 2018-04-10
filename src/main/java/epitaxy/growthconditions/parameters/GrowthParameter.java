@@ -63,7 +63,7 @@ public abstract class GrowthParameter {
     /**
      * It processes the GrowthParameter that includes resampling of its values by a piecewise linear approximation and determination of active intervals
      */
-    public void process() {
+    public void init() {
         resample();
         determineIntervals();
     }

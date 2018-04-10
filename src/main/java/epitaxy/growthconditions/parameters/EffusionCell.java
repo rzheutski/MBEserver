@@ -1,21 +1,22 @@
 package epitaxy.growthconditions.parameters;
 
 /**
- * The class extends the abstract GrowthParameterWithShutter class. It is for Knudsen effusion cell.
+ * The class extends the abstract Precursor class. It is for Knudsen effusion cell.
  */
-public class EffusionCell extends GrowthParameterWithShutter {
+public class EffusionCell extends Precursor {
 
-    public double getAad() {
-        return aad;
-    }
-
-    private double aad;          // adsorption rate: Vad = aad*Exp(kad*value)
-    private double kad;
-    private double ades;          // desorption rate: Vdes = ades*Exp(kdes/substrateTemperature)
-    private double kdes;
+    private double effusKoeff;          // effusion rate: rateFlow = effusKoeff*Exp(-effusTemperature/value)
+    private double effusTemperature;
+    private double desorpKoeff;          // desorption rate: rateDes = desorpKoeff*Exp(desorpTemperature/substrateTemperature)
+    private double desorpTemperature;
 
     public EffusionCell() {
         super();
+    }
+
+    @Override
+    public double getGrowthRate(long timeStamp, double substrateTemperature) {
+        return (effusKoeff*Math.exp(-effusTemperature/getValueAtTimeStamp(timeStamp)) - desorpKoeff*Math.exp(desorpTemperature/substrateTemperature));
     }
 
 }
