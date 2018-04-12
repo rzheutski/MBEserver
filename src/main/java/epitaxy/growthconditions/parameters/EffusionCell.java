@@ -5,9 +5,10 @@ package epitaxy.growthconditions.parameters;
  */
 public class EffusionCell extends Precursor {
 
-    private double effusKoeff;          // effusion rate: rateFlow = effusKoeff*Exp(-effusTemperature/value)
+    // growth rate: vGr = vFlow - vDes;
+    private double effusKoeff;          // effusion rate: vFlow = effusKoeff*Exp(-effusTemperature/value)
     private double effusTemperature;
-    private double desorpKoeff;          // desorption rate: rateDes = desorpKoeff*Exp(desorpTemperature/substrateTemperature)
+    private double desorpKoeff;          // desorption rate: vDes = desorpKoeff*Exp(desorpTemperature/substrateTemperature)
     private double desorpTemperature;
 
     public EffusionCell() {
@@ -16,7 +17,8 @@ public class EffusionCell extends Precursor {
 
     @Override
     public double getGrowthRate(long timeStamp, double substrateTemperature) {
-        return (effusKoeff*Math.exp(-effusTemperature/getValueAtTimeStamp(timeStamp)) - desorpKoeff*Math.exp(desorpTemperature/substrateTemperature));
+        Double value = getValueAtTimeStamp(timeStamp);
+        return ((value == null) || (value == 0))? 0 : (effusKoeff*Math.exp(-effusTemperature/getValueAtTimeStamp(timeStamp)) - desorpKoeff*Math.exp(desorpTemperature/substrateTemperature));
     }
 
 }

@@ -2,7 +2,10 @@ package epitaxy.structure;
 
 import epitaxy.growthconditions.Data;
 import epitaxy.growthconditions.datatreatment.Approximation;
+import epitaxy.growthconditions.parameters.EffusionCell;
+import epitaxy.growthconditions.parameters.GasFlow;
 import epitaxy.growthconditions.parameters.GrowthParameter;
+import epitaxy.growthconditions.parameters.SubstrateHeat;
 
 import java.util.List;
 
@@ -12,17 +15,17 @@ import java.util.List;
 public class Material {
 
     // all possible growth parameters at nitride molecular beam epitaxy
-    private GrowthParameter gallium;
-    private GrowthParameter aluminium;
-    private GrowthParameter indium;
-    private GrowthParameter silicon;
-    private GrowthParameter magnesium;
-    private GrowthParameter nitrogenPlasma;
-    private GrowthParameter ammonia;
-    private GrowthParameter silane;
-    private GrowthParameter substrateHeatPower;
-    private GrowthParameter substrateTemperature;
-    private GrowthParameter pyrometer;
+    private EffusionCell gallium;
+    private EffusionCell aluminium;
+    private EffusionCell indium;
+    private EffusionCell silicon;
+    private EffusionCell magnesium;
+    private GasFlow nitrogenPlasma;
+    private GasFlow ammonia;
+    private GasFlow silane;
+    private SubstrateHeat substrateHeatPower;
+    private SubstrateHeat substrateTemperature;
+    private SubstrateHeat pyrometer;
 
     private long timeStamp;
     private Data data;
@@ -34,6 +37,9 @@ public class Material {
     //stoichiometry coefficients
     private double xInN; // Indium nitride mole fraction
     private double yAlN; // Aluminium nitride mole fraction
+
+    private double growthRate;
+    private MaterialType materialType;
 
     private List<GrowthParameter> dopants;
 
@@ -68,17 +74,17 @@ public class Material {
      */
     private void setActiveParameters() {
         for (GrowthParameter parameter : parameters) {
-            if (parameter.getName().contains("Ga")) gallium = parameter;
-            else if (parameter.getName().contains("Al")) aluminium = parameter;
-            else if (parameter.getName().contains("In")) indium = parameter;
-            else if (parameter.getName().contains("Si")) silicon = parameter;
-            else if (parameter.getName().contains("Mg")) magnesium = parameter;
-            else if (parameter.getName().contains("N2")) nitrogenPlasma = parameter;
-            else if (parameter.getName().contains("NH3")) ammonia = parameter;
-            else if (parameter.getName().contains("SiH4")) silane = parameter;
-            else if (parameter.getName().toLowerCase().contains("power")) substrateHeatPower = parameter;
-            else if (parameter.getName().toLowerCase().contains("temp")) substrateTemperature = parameter;
-            else if (parameter.getName().toLowerCase().contains("pyro")) pyrometer = parameter;
+            if (parameter.getName().contains("Ga")) gallium = (EffusionCell)parameter;
+            else if (parameter.getName().contains("Al")) aluminium = (EffusionCell)parameter;
+            else if (parameter.getName().contains("In")) indium = (EffusionCell)parameter;
+            else if (parameter.getName().contains("Si")) silicon = (EffusionCell)parameter;
+            else if (parameter.getName().contains("Mg")) magnesium = (EffusionCell)parameter;
+            else if (parameter.getName().contains("N2")) nitrogenPlasma = (GasFlow)parameter;
+            else if (parameter.getName().contains("NH3")) ammonia = (GasFlow)parameter;
+            else if (parameter.getName().contains("SiH4")) silane = (GasFlow)parameter;
+            else if (parameter.getName().toLowerCase().contains("power")) substrateHeatPower = (SubstrateHeat)parameter;
+            else if (parameter.getName().toLowerCase().contains("temp")) substrateTemperature = (SubstrateHeat)parameter;
+            else if (parameter.getName().toLowerCase().contains("pyro")) pyrometer = (SubstrateHeat)parameter;
         }
     }
 
@@ -87,14 +93,36 @@ public class Material {
      */
     private void getStoichiometry() {
         determinePyrometerTemperature();
-        if ( (isPresent(gallium) | isPresent(aluminium) | isPresent(indium)) & isPresent(ammonia) ) ammoniaInAlGaN();
+        if ( (isPresent(indium) | isPresent(aluminium) | isPresent(gallium)) & (isPresent(ammonia) | isPresent(nitrogenPlasma)) ) InAlGaN();
 
     }
 
     /**
-     * It processes an InAlGaN grown by ammonia molecular beam epitaxy.
+     * It processes an InAlGaN grown either by ammonia molecular beam epitaxy or by plasma molecular beam epitaxy.
      */
-    private void ammoniaInAlGaN() {
+    private void InAlGaN() {
+        materialType = MaterialType.InAlN;
+        double vIn = indium.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vAl = aluminium.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vGa = gallium.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vNH3 = ammonia.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vNplasma = nitrogenPlasma.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vNitrogen = (vNH3 == 0)? vNplasma : vNH3;
+        if ((vIn + vAl + vGa) < vNitrogen) {
+            // nitrogen-rich conditions
+            growthRate = vIn + vAl + vGa;
+            xInN = vIn/growthRate;
+            yAlN = vAl/growthRate;
+
+        }
+        else {
+            // metal-rich conditions
+            growthRate = vNitrogen;
+            xInN = Math.max(0, (growthRate - vAl - vGa)/growthRate);
+            yAlN = vAl/growthRate;
+
+        }
+
 
     }
 

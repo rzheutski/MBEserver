@@ -25,6 +25,7 @@ public class Main {
 
 
 
+
 /*        for (GrowthParameter growthParameter : growthParameters)
         if (growthParameter instanceof Precursor) {
             System.out.println(((Precursor) growthParameter).ShuttterEventsToString());
