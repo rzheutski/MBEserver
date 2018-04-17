@@ -119,7 +119,7 @@ public class Material {
             // metal-rich conditions
             growthRate = vNitrogen;
             xInN = Math.max(0, (growthRate - vAl - vGa)/growthRate);
-            yAlN = vAl/growthRate;
+            yAlN = Math.min(1, vAl/growthRate);
 
         }
 
