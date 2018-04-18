@@ -65,14 +65,14 @@ public class Material {
      * It calculates all parameters of the material
      */
     private void initMaterial() {
-        setActiveParameters();
+        getParameters();
         getStoichiometry();
     }
 
     /**
      * It sets all actual precursors for this material. A precursor remains null if it is not actual for the current material.
      */
-    private void setActiveParameters() {
+    private void getParameters() {
         for (GrowthParameter parameter : parameters) {
             if (parameter.getName().contains("Ga")) gallium = (EffusionCell)parameter;
             else if (parameter.getName().contains("Al")) aluminium = (EffusionCell)parameter;
@@ -93,7 +93,13 @@ public class Material {
      */
     private void getStoichiometry() {
         determinePyrometerTemperature();
-        if ( (isPresent(indium) | isPresent(aluminium) | isPresent(gallium)) & (isPresent(ammonia) | isPresent(nitrogenPlasma)) ) InAlGaN();
+        if ((isPresent(indium) | isPresent(aluminium) | isPresent(gallium)) & (isPresent(ammonia) | isPresent(nitrogenPlasma))) InAlGaN();
+        else if (isPresent(indium) | isPresent(aluminium) | isPresent(gallium)) metal();
+        else if ((isPresent(silane) | isPresent(silicon)) & (isPresent(ammonia) | isPresent(nitrogenPlasma))) SiN();
+        else if (isPresent(ammonia)) ammonia();
+        else if (isPresent(nitrogenPlasma)) nitrogenPlasma();
+        else empty();
+
 
     }
 
@@ -122,8 +128,59 @@ public class Material {
             yAlN = Math.min(1, vAl/growthRate);
 
         }
+    }
 
+    /**
+     * It processes a metal-deposited layer.
+     */
+    private void metal() {
+        materialType = MaterialType.METAL;
+        double vIn = indium.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vAl = aluminium.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vGa = gallium.getGrowthRate(timeStamp, pyrometerTemperature);
+        growthRate = vIn + vAl + vGa;
+    }
 
+    /**
+     * It processes a silicon nitride layer.
+     */
+    private void SiN() {
+        materialType = MaterialType.SiN;
+        double vSilicon = silicon.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vSilane = silane.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vSi = (vSilicon == 0)? vSilane : vSilicon;
+        double vNH3 = ammonia.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vNplasma = nitrogenPlasma.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vNitrogen = (vNH3 == 0)? vNplasma : vNH3;
+        // A growth rate function is unknown now, therefore it is accepted as zero for the moment.
+        growthRate = 0;
+
+    }
+
+    /**
+     * It processes an imaginary layer corresponding to exposing of the sample to an ammonia flow.
+     */
+    private void ammonia() {
+        double vNH3 = ammonia.getGrowthRate(timeStamp, pyrometerTemperature);
+        growthRate = vNH3;
+        materialType = MaterialType.NH3;
+    }
+
+    /**
+     * It processes an imaginary layer corresponding to exposing of the sample to a nitrogen plasma flow.
+     */
+    private void nitrogenPlasma() {
+        double vNplasma = nitrogenPlasma.getGrowthRate(timeStamp, pyrometerTemperature);
+        growthRate = vNplasma;
+        materialType = MaterialType.NITROGEN_PLASMA;
+    }
+
+    /**
+     * It processes a case of absence of an active precursors
+     */
+    private void empty() {
+        materialType = MaterialType.EMPTY;
+        growthRate = 0;
     }
 
     /**
