@@ -1,0 +1,113 @@
+{
+  "aluminium": {
+    "id": 0,
+    "name": "Al",
+    "description": "Aluminium source",
+    "timeStep_ms": 5000,
+    "resamplingError": 1,
+    "agr": 1,
+    "kgr": 2,
+    "ades": 3,
+    "kdes": 4
+  },
+  "gallium": {
+    "id": 1,
+    "name": "Ga",
+    "description": "Gallium source",
+    "timeStep_ms": 5000,
+    "resamplingError": 1,
+    "agr": 1,
+    "kgr": 2,
+    "ades": 3,
+    "kdes": 4
+  },
+  "silicon": {
+    "id": 2,
+    "name": "Si",
+    "description": "Silicon source",
+    "timeStep_ms": 5000,
+    "resamplingError": 1,
+    "agr": 1,
+    "kgr": 2,
+    "ades": 3,
+    "kdes": 4
+  },
+  "indium": {
+    "id": 4,
+    "name": "In",
+    "description": "Indium source",
+    "timeStep_ms": 5000,
+    "resamplingError": 1,
+    "agr": 1,
+    "kgr": 2,
+    "ades": 3,
+    "kdes": 4
+  },
+  "magnesium": {
+    "id": 3,
+    "name": "Mg",
+    "description": "Magnesium source",
+    "timeStep_ms": 5000,
+    "resamplingError": 1,
+    "agr": 1,
+    "kgr": 2,
+    "ades": 3,
+    "kdes": 4
+  },
+  "nitrogenPlasma": {
+    "id": 5,
+    "name": "N2Plasma",
+    "description": "Nitrogen plasma source",
+    "timeStep_ms": 5000,
+    "resamplingError": 1,
+    "kgr": 88
+  },
+  "ammonia": {
+    "id": 6,
+    "name": "NH3",
+    "description": "Ammonia source",
+    "timeStep_ms": 5000,
+    "resamplingError": 5,
+    "kgr": 88
+  },
+  "silane": {
+    "id": 7,
+    "name": "SiH4",
+    "description": "Silane source",
+    "timeStep_ms": 5000,
+    "resamplingError": 5,
+    "kgr": 88
+  },
+  "heaterPower": {
+    "id": 8,
+    "name": "GMpower",
+    "notation": "Growth manipulator heating power",
+    "timeStep_ms": 5000,
+    "resamplingError": 1
+  },
+  "heaterTemperature": {
+    "id": 9,
+    "name": "GMtemp",
+    "notation": "Growth manipulator temperature",
+    "timeStep_ms": 5000,
+    "resamplingError": 20
+  },
+  "pyrometerTemperature": {
+    "id": 10,
+    "name": "Pyro",
+    "notation": "Pyrometer temperature",
+    "timeStep_ms": 5000,
+    "resamplingError": 0
+  },
+  "activeParametersId": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ]
+}
