@@ -18,7 +18,7 @@ public class Material {
     private static final String MAGNESIUM_DOPANT = "Mg";
 
     // all possible growth parameters at nitride molecular beam epitaxy
-    private EffusionCell gallium;
+  /*  private EffusionCell gallium;
     private EffusionCell aluminium;
     private EffusionCell indium;
     private EffusionCell silicon;
@@ -28,7 +28,7 @@ public class Material {
     private GasFlow silane;
     private SubstrateHeat substrateHeaterPower;
     private SubstrateHeat substrateHeaterTemperature;
-    private SubstrateHeat pyrometer;
+    private SubstrateHeat pyrometer;*/
 
     private long timeStamp;
     private Data data;
@@ -50,7 +50,7 @@ public class Material {
     private List<Double> dopingLevels;
 
     public Material(Data data, long timeStamp) {
-        this(data, timeStamp, 0);
+        this(data, timeStamp, timeStamp);
     }
 
     /**
@@ -80,7 +80,10 @@ public class Material {
      * It sets all actual precursors for this material. A precursor remains null if it is not actual for the current material.
      */
     private void determineParameters() {
-        for (GrowthParameter parameter : parameters) {
+
+
+
+        /*for (GrowthParameter parameter : parameters) {
             if (parameter.getName().contains("Ga")) gallium = (EffusionCell)parameter;
             else if (parameter.getName().contains("Al")) aluminium = (EffusionCell)parameter;
             else if (parameter.getName().contains("In")) indium = (EffusionCell)parameter;
@@ -92,7 +95,7 @@ public class Material {
             else if (parameter.getName().toLowerCase().contains("power")) substrateHeaterPower = (SubstrateHeat)parameter;
             else if (parameter.getName().toLowerCase().contains("temp")) substrateHeaterTemperature = (SubstrateHeat)parameter;
             else if (parameter.getName().toLowerCase().contains("pyro")) pyrometer = (SubstrateHeat)parameter;
-        }
+        }*/
     }
 
     /**
@@ -100,26 +103,24 @@ public class Material {
      */
     private void determineStoichiometry() {
         determineSubstrateTemperature();
-        if ((isPresent(indium) | isPresent(aluminium) | isPresent(gallium)) & (isPresent(ammonia) | isPresent(nitrogenPlasma))) InAlGaN();
-        else if (isPresent(indium) | isPresent(aluminium) | isPresent(gallium)) metal();
-        else if ((isPresent(silane) | isPresent(silicon)) & (isPresent(ammonia) | isPresent(nitrogenPlasma))) SiN();
-        else if (isPresent(ammonia)) ammonia();
-        else if (isPresent(nitrogenPlasma)) nitrogenPlasma();
+        if ((isPresent(data.indium) | isPresent(data.aluminium) | isPresent(data.gallium)) & (isPresent(data.ammonia) | isPresent(data.nitrogenPlasma))) InAlGaN();
+        else if (isPresent(data.indium) | isPresent(data.aluminium) | isPresent(data.gallium)) metal();
+        else if ((isPresent(data.silane) | isPresent(data.silicon)) & (isPresent(data.ammonia) | isPresent(data.nitrogenPlasma))) SiN();
+        else if (isPresent(data.ammonia)) ammonia();
+        else if (isPresent(data.nitrogenPlasma)) nitrogenPlasma();
         else empty();
-
-
     }
 
     /**
-     * It processes an InAlGaN grown either by ammonia molecular beam epitaxy or by plasma molecular beam epitaxy.
+     * It processes an InAlGaN grown either by ammonia or by plasma molecular beam epitaxy.
      */
     private void InAlGaN() {
         materialType = MaterialType.InAlN;
-        double vIn = indium.getGrowthRate(timeStamp, pyrometerTemperature);
-        double vAl = aluminium.getGrowthRate(timeStamp, pyrometerTemperature);
-        double vGa = gallium.getGrowthRate(timeStamp, pyrometerTemperature);
-        double vNH3 = ammonia.getGrowthRate(timeStamp, pyrometerTemperature);
-        double vNplasma = nitrogenPlasma.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vIn = data.indium.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vAl = data.aluminium.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vGa = data.gallium.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vNH3 = data.ammonia.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vNplasma = data.nitrogenPlasma.getGrowthRate(timeStamp, pyrometerTemperature);
         double vNitrogen = (vNH3 == 0)? vNplasma : vNH3;
         if ((vIn + vAl + vGa) < vNitrogen) {
             // nitrogen-rich conditions
@@ -127,7 +128,6 @@ public class Material {
             growthRate = vIn + vAl + vGa;
             xInN = vIn/growthRate;
             yAlN = vAl/growthRate;
-
         }
         else {
             // metal-rich conditions
@@ -144,9 +144,9 @@ public class Material {
      */
     private void metal() {
         materialType = MaterialType.METAL;
-        double vIn = indium.getGrowthRate(timeStamp, pyrometerTemperature);
-        double vAl = aluminium.getGrowthRate(timeStamp, pyrometerTemperature);
-        double vGa = gallium.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vIn = data.indium.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vAl = data.aluminium.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vGa = data.gallium.getGrowthRate(timeStamp, pyrometerTemperature);
         growthRate = vIn + vAl + vGa;
     }
 
@@ -155,11 +155,11 @@ public class Material {
      */
     private void SiN() {
         materialType = MaterialType.SiN;
-        double vSilicon = silicon.getGrowthRate(timeStamp, pyrometerTemperature);
-        double vSilane = silane.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vSilicon = data.silicon.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vSilane = data.silane.getGrowthRate(timeStamp, pyrometerTemperature);
         double vSi = (vSilicon == 0)? vSilane : vSilicon;
-        double vNH3 = ammonia.getGrowthRate(timeStamp, pyrometerTemperature);
-        double vNplasma = nitrogenPlasma.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vNH3 = data.ammonia.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vNplasma = data.nitrogenPlasma.getGrowthRate(timeStamp, pyrometerTemperature);
         double vNitrogen = (vNH3 == 0)? vNplasma : vNH3;
         // A growth rate function is unknown now, therefore it is accepted as zero for the moment.
         growthRate = 0;
@@ -170,7 +170,7 @@ public class Material {
      * It processes an imaginary layer corresponding to exposing of the sample to an ammonia flow.
      */
     private void ammonia() {
-        double vNH3 = ammonia.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vNH3 = data.ammonia.getGrowthRate(timeStamp, pyrometerTemperature);
         growthRate = vNH3;
         materialType = MaterialType.NH3;
     }
@@ -179,7 +179,7 @@ public class Material {
      * It processes an imaginary layer corresponding to exposing of the sample to a nitrogen plasma flow.
      */
     private void nitrogenPlasma() {
-        double vNplasma = nitrogenPlasma.getGrowthRate(timeStamp, pyrometerTemperature);
+        double vNplasma = data.nitrogenPlasma.getGrowthRate(timeStamp, pyrometerTemperature);
         growthRate = vNplasma;
         materialType = MaterialType.NITROGEN_PLASMA;
     }
@@ -208,17 +208,17 @@ public class Material {
     private void determineSubstrateTemperature() {
         long startLayerTimeStamp = 0;
         long stopLayerTimeStamp = 0;
-        for (int i = 1; i < substrateHeaterPower.size(); i++) {
-            if (substrateHeaterPower.getTimeStamp(i) > centerLayerTimeStamp) {
-                startLayerTimeStamp = substrateHeaterPower.getTimeStamp(i-1);
-                stopLayerTimeStamp = substrateHeaterPower.getTimeStamp(i);
+        for (int i = 1; i < data.heaterPower.size(); i++) {
+            if (data.heaterPower.getTimeStamp(i) > centerLayerTimeStamp) {
+                startLayerTimeStamp = data.heaterPower.getTimeStamp(i-1);
+                stopLayerTimeStamp = data.heaterPower.getTimeStamp(i);
             }
         }
-        if (substrateHeaterPower.getValueAtTimeStamp(startLayerTimeStamp) == substrateHeaterPower.getValueAtTimeStamp(stopLayerTimeStamp)) pyrometerTemperature = Approximation.getConstant(pyrometer, startLayerTimeStamp, stopLayerTimeStamp);
-        else pyrometerTemperature = Approximation.getLinearFit(pyrometer, startLayerTimeStamp, stopLayerTimeStamp).getValue(timeStamp);
+        if (data.heaterPower.getValueAtTimeStamp(startLayerTimeStamp) == data.heaterPower.getValueAtTimeStamp(stopLayerTimeStamp)) pyrometerTemperature = Approximation.getConstant(data.pyrometerTemperature, startLayerTimeStamp, stopLayerTimeStamp);
+        else pyrometerTemperature = Approximation.getLinearFit(data.pyrometerTemperature, startLayerTimeStamp, stopLayerTimeStamp).getValue(timeStamp);
 
-        heaterPower = substrateHeaterPower.getValueAtTimeStamp(timeStamp);
-        heaterTemperature = substrateHeaterTemperature.getValueAtTimeStamp(timeStamp);
+        heaterPower = data.heaterPower.getValueAtTimeStamp(timeStamp);
+        heaterTemperature = data.heaterTemperature.getValueAtTimeStamp(timeStamp);
 
     }
 
@@ -226,17 +226,17 @@ public class Material {
      * It determines dopants and their concentrations.
      */
     private void determineDopants() {
-        if (isPresent(silicon)) {
+        if (isPresent(data.silicon)) {
             dopants.add(SILICON_DOPANT);
-            dopingLevels.add(silicon.getGrowthRate(timeStamp, pyrometerTemperature));
+            dopingLevels.add(data.silicon.getGrowthRate(timeStamp, pyrometerTemperature));
         }
-        if (isPresent(silane)) {
+        if (isPresent(data.silane)) {
             dopants.add(SILICON_DOPANT);
-            dopingLevels.add(silane.getGrowthRate(timeStamp, pyrometerTemperature));
+            dopingLevels.add(data.silane.getGrowthRate(timeStamp, pyrometerTemperature));
         }
-        if (isPresent(magnesium)) {
+        if (isPresent(data.magnesium)) {
             dopants.add(MAGNESIUM_DOPANT);
-            dopingLevels.add(magnesium.getGrowthRate(timeStamp, pyrometerTemperature));
+            dopingLevels.add(data.magnesium.getGrowthRate(timeStamp, pyrometerTemperature));
         }
     }
 
