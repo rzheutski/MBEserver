@@ -21,4 +21,16 @@ public class EffusionCell extends Precursor {
         return ((value == null) || (value == 0))? 0 : (effusKoeff*Math.exp(-effusTemperature/getValueAtTimeStamp(timeStamp)) - desorpKoeff*Math.exp(desorpTemperature/substrateTemperature));
     }
 
+    /**
+     * Returns value of growth rate for the precursor at the given time stamp and substrate temperature taking into account desorption weighting factor
+     * @param timeStamp time stamp for the growth rate got
+     * @param substrateTemperature value of substrate temperature
+     * @param desorptionFactor desorption weighting factor which multiplies desorption rate
+     * @return growth rate value in um/hour units
+     */
+    public double getGrowthRate(long timeStamp, double substrateTemperature, double desorptionFactor) {
+        Double value = getValueAtTimeStamp(timeStamp);
+        return ((value == null) || (value == 0))? 0 : (effusKoeff*Math.exp(-effusTemperature/getValueAtTimeStamp(timeStamp)) - desorptionFactor*desorpKoeff*Math.exp(desorpTemperature/substrateTemperature));
+    }
+
 }

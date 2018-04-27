@@ -3,9 +3,13 @@ import epitaxy.growthconditions.FilesMBE;
 import epitaxy.growthconditions.datatreatment.Approximation;
 import epitaxy.growthconditions.parameters.GrowthParameter;
 import epitaxy.structure.Heterostructure;
+import epitaxy.structure.Layer;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -14,15 +18,20 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) throws IOException {
 
-        Data data = FilesMBE.getData("resources/input/B052/values.csv", "resources/input/B052/shutters.csv", "resources/input/B052/settings5.json");
-    //    Heterostructure B052 = new Heterostructure(data);
+        Data data = FilesMBE.getData("resources/input/B081/B081_values.csv", "resources/input/B081/B081_shutters.csv", "resources/input/B081/B081_settings.json");
+        Heterostructure B081 = new Heterostructure(data);
 
-        List<GrowthParameter> growthParameters = data.getGrowthParameters();
+        for (Layer layer : B081.getLayers()) {
+            System.out.println(layer.getStartMaterial().getFormula());
+        }
+
+
+       /* List<GrowthParameter> growthParameters = data.getGrowthParameters();
 
         FilesMBE.saveValues("resources/output/pyro.txt", growthParameters.get(10));
         System.out.println("slope = " + Approximation.getLinearFit(growthParameters.get(10), 1503230089052l, 1503256991992l).getValue(1503256991992l));
         System.out.println("constant = " + Approximation.getConstant(growthParameters.get(10), 1503230089052l, 1503256991992l));
-
+*/
 
 
 

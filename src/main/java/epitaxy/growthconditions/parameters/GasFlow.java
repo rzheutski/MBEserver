@@ -5,16 +5,21 @@ package epitaxy.growthconditions.parameters;
  */
 public class GasFlow extends Precursor {
 
-    // growth rate: vGr = koeff*value
-    private double koeff;
+    // growth rate: vGr = a*value + b
+    private double a;
+    private double b;
 
     public GasFlow() {
         super();
     }
 
     @Override
+    /**
+     * Returns growth rate value for the gas flow precursor at the given timestamp and substrate temperature.
+     */
     public double getGrowthRate(long timeStamp, double substrateTemperature) {
-        return koeff*getValueAtTimeStamp(timeStamp);
+        Double value = getValueAtTimeStamp(timeStamp);
+        return ((value == null) || (value == 0))? 0 : (a + b*getValueAtTimeStamp(timeStamp));
     }
 
 }
